@@ -1,3 +1,4 @@
+from typing import Union
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import torch
@@ -84,7 +85,7 @@ def plot_results_all(
     boxes,
     labels,
     scores,
-    model: ConditionalDetrForObjectDetection | DeformableDetrForObjectDetection,
+    model: Union[ConditionalDetrForObjectDetection, DeformableDetrForObjectDetection],
     colors=None,
 ):
     plt.figure(figsize=(16, 10))

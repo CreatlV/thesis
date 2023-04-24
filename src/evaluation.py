@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from tqdm.auto import tqdm
 import torch
 
@@ -16,8 +16,8 @@ from datasets import Dataset
 
 
 def run_evaluation_cond(
-    model: ConditionalDetrForObjectDetection | DeformableDetrForObjectDetection,
-    feature_extractor: ConditionalDetrImageProcessor | DeformableDetrImageProcessor,
+    model: Union[ConditionalDetrForObjectDetection, DeformableDetrForObjectDetection],
+    feature_extractor: Union[ConditionalDetrImageProcessor, DeformableDetrImageProcessor],
     test_dataloader: DataLoader,
     device: torch.device,
     plot: bool = False,
