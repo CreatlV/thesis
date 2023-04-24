@@ -1,0 +1,65 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore logs and other generated files
+logs/
+*.log
+npm-debug.log*
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+
+# Ignore build output
+build/
+dist/
+out/
+*.pid
+*.pid.lock
+
+# Ignore VSCode related files and folders
+.vscode/
+*.code-workspace
+
+# Ignore dependencies installed via Yarn
+.yarn/
+
+# Ignore Jest test result files
+coverage/
+*.pem
+*.pem.lock
+.cache
+
+# Ignore .DS_Store files on macOS
+.DS_Store
+
+# Ignore TypeScript cache and output files
+*.tsbuildinfo
+
+# Ignore SASS cache
+.sass-cache/
+
+screenshots/
+*dump
+bounding-boxes*.json
+
+/datasets
+*.jsonl
+*.json
+*.csv
+
+## Training artifacts
+*.pth
+*.pt
+*.bin
+checkpoint-*
+wandb
+
+
+nohup.out
+__pycache__
+*.png
