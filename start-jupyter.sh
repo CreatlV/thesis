@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # Start JupyterLab
 
 nohup jupyter-lab \
