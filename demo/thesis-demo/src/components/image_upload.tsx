@@ -1,12 +1,17 @@
 import { Heading, Input } from "@chakra-ui/react";
 import axios from "axios";
-import { SetStateAction, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 const ImageUpload = () => {
-  const [image, setImage] = useState<FileList | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const [result, setResult] = useState<string | null>(null);
 
-  const handleImageUpload = (event: { target: { files: SetStateAction<FileList | null>[]; }; }) => {
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+
+    if (!event.target.files) {
+      return;
+    }
+
     setImage(event.target.files[0]);
   };
 
