@@ -1,11 +1,12 @@
-import { Box, Button, FormControl, FormLabel, Heading, Input, VStack } from '@chakra-ui/react';
+import { Box, FormControl, FormLabel, Heading, Input, Spinner, VStack } from '@chakra-ui/react';
 import axios from 'axios';
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 interface Response {
   scores: number[],
   labels: number[],
   boxes: number[][],
+  processed_image: string,
 }
 
 const categoryMap = new Map<number, string>([
@@ -15,31 +16,53 @@ const categoryMap = new Map<number, string>([
 ]);
 
 const ImageUpload = () => {
-  const [image, setImage] = useState<File | null>(null);
-  const [result, setResult] = useState<string | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [image, setImage] = useState<null | string>(null);
+  const [previewImage, setPreviewImage] = useState<File | null>(null);  // Preview image
   const [boxes, setBoxes] = useState<number[][]>([]);
   const [labels, setLabels] = useState<number[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setResult(null);
-    setBoxes([]);
-    setLabels([]);
-
-  }, [image]);
-
+  // First useEffect for drawing the image
   useEffect(() => {
     if (canvasRef.current && previewImage) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
 
       let img = new Image();
-      img.src = previewImage;
+
+      img.src = URL.createObjectURL(previewImage)
+
       img.onload = function () {
-        const scaleFactor = 700 / img.width; // or 500 / img.height to scale by height
-        canvas.width = img.width * scaleFactor;
-        canvas.height = img.height * scaleFactor;
+        const scale = 700 / img.width; // or 500 / img.height to scale by height
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        if (!context) {
+          return;
+        }
+
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      };
+    }
+  }, [previewImage]);
+
+  // First useEffect for drawing the image
+  useEffect(() => {
+    if (canvasRef.current && image) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      let img = new Image();
+
+      img.src = `data:image/jpeg;base64,${image}`;
+
+      img.onload = function () {
+        const scale = 700 / img.width; // or 500 / img.height to scale by height
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
         if (!context) {
           return;
         }
@@ -48,69 +71,71 @@ const ImageUpload = () => {
         // Draw the bounding boxes
         context.beginPath();
         boxes.forEach((box) => {
-          context.rect(box[0] * scaleFactor, box[1] * scaleFactor, (box[2] - box[0]) * scaleFactor, (box[3] - box[1]) * scaleFactor);
+          context.rect(box[0] * scale, box[1] * scale, (box[2] - box[0]) * scale, (box[3] - box[1]) * scale);
         });
 
         // Draw the labels
-        context.font = `${20 * scaleFactor}px Arial`;
+        context.font = `${20 * scale}px Arial`;
         context.fillStyle = 'red';
         labels.forEach((label, index) => {
           const text = categoryMap.get(label);
-          context.fillText(text ?? "unknown", boxes[index][0] * scaleFactor, boxes[index][1] * scaleFactor - 5);
+          context.fillText(text ?? "unknown", boxes[index][0] * scale, boxes[index][1] * scale - 5);
         });
 
         context.strokeStyle = 'rgba(255, 0, 0, 0.7)';
-        context.lineWidth = 4 * scaleFactor;
+        context.lineWidth = 4 * scale;
         context.stroke();
+
       };
     }
-  }, [previewImage, boxes]);
+  }, [image]);
 
-
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
     }
 
-    setPreviewImage(URL.createObjectURL(event.target.files[0]));
-    setImage(event.target.files[0]);
-  };
+    setBoxes([]);
+    setLabels([]);
+    setPreviewImage(event.target.files[0]);
+    setImage(null);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    let formData = new FormData();
+    formData.append("file", event.target.files[0]);
 
-    if (image) {
-      let formData = new FormData();
-      formData.append("file", image);
-
-      try {
-        const response = await axios.post(
-          "http://localhost:8989/predict",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        const data: Response = response.data["data"][0];
-        setResult(JSON.stringify(response.data, null, 2));
-        setBoxes(data.boxes);  // Save the bounding boxes
-        setLabels(data.labels);  // Save the labels
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setResult("Error: " + error?.response?.data?.message);
+    try {
+      setLoading(true)
+      const response = await axios.post(
+        "http://localhost:8989/predict",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
+      );
+
+      const data: Response = response.data;
+      console.log(data);
+      setBoxes(data.boxes);  // Save the bounding boxes
+      setLabels(data.labels);  // Save the labels
+      setImage(data.processed_image);  // Save the processed image
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Handle error
       }
+    } finally {
+      setLoading(false)
     }
-  };
+  }
+
 
   return (
     <>
       <VStack
         spacing={5}
         width="400px"
+        height="150px"
         maxW="md"
         margin="auto"
         p={5}
@@ -120,22 +145,20 @@ const ImageUpload = () => {
         boxShadow="lg"
       >
         <Heading>Upload Image</Heading>
-        <form onSubmit={handleSubmit}>
-          <FormControl id="upload-image">
-            <FormLabel cursor={"pointer"} background={"#e8e8e8"} p="8px 16px" borderRadius="8px">Choose an image
-              <Input display={"none"} type="file" accept="image/*" onChange={handleImageUpload} />
-            </FormLabel>
-          </FormControl>
-          <Button opacity={!image ? 0.5 : 1} colorScheme="teal" type="submit" mt="16px">
-            Submit
-          </Button>
-        </form>
+        {!loading && <FormControl id="upload-image">
+          <FormLabel textAlign={"center"} cursor={"pointer"} background={"#e8e8e8"} p="8px 16px" borderRadius="8px">Choose an image
+            <Input display={"none"} type="file" accept="image/*" onChange={handleImageUpload} />
+          </FormLabel>
+        </FormControl>}
+        {loading && <Spinner />}
       </VStack>
       <Box mt="16px">
-        {previewImage && <canvas ref={canvasRef} />}
+        {(image || previewImage) && <canvas ref={canvasRef} />}
       </Box>
     </>
   );
 }
 
 export default ImageUpload;
+
+
