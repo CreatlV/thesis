@@ -1,20 +1,30 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import Body, FastAPI, HTTPException, UploadFile, File
 import logging
+from pydantic import BaseModel
 from starlette.responses import JSONResponse
 import torch
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 from PIL import Image
 import io
 from fastapi.middleware.cors import CORSMiddleware
 from transformers import (
-    ConditionalDetrImageProcessor,
-    ConditionalDetrForObjectDetection,
+    ConditionalDetrImageProcessor,  # type: ignore
+    ConditionalDetrForObjectDetection,  # type: ignore
 )
 from dotenv import load_dotenv
 import os
 from huggingface_hub import HfApi, HfFolder
 import base64
 from io import BytesIO
+import openai
+from lm.openai_parser import ModelType, extract_dictionary_from_text
+from lm.dict_match import get_html_xpath_from_dict
+
+from lm.html_utils import clean_html, download_html_and_text
+from lm.xpath_scraper import extract_data_from_html
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 load_dotenv()
 token = os.getenv("HUGGINGFACE_TOKEN")
@@ -39,6 +49,8 @@ app.add_middleware(
 TARGET_SIZE = 1280
 
 logging.basicConfig(level=logging.INFO)
+
+adapted_domains = dict()
 
 # Load pre-trained model
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -72,10 +84,10 @@ async def predict(file: UploadFile = File(...)):
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     width, height = image.size
     scale_factor = TARGET_SIZE / width
-    
+
     # Resize the width to the target size and scale the height proportionally
     resized_img = image.resize((TARGET_SIZE, int(height * scale_factor)))
-    
+
     # Calculate coordinates to crop the height to the target size
     top = 0
     bottom = TARGET_SIZE
@@ -105,12 +117,59 @@ async def predict(file: UploadFile = File(...)):
             for key, tensor in item.items():
                 serialized_item[key] = tensor.detach().cpu().numpy().tolist()
 
-
-        return JSONResponse(
-            content={
-                **serialized_item,
-                "processed_image": img_str
-            }
-        )
+        return JSONResponse(content={**serialized_item, "processed_image": img_str})
 
     return JSONResponse(content={"message": "Something went wrong!"})
+
+
+class Website(BaseModel):
+    url: str
+
+
+@app.post("/lm/predict")
+async def lm_predict(website: Website):
+    logging.info(f"Recieved a url: {website.url}")
+    visible_text, html_string = await download_html_and_text(
+        website.url, use_cache=False
+    )
+    model: ModelType = "gpt-4"
+    openai_response = extract_dictionary_from_text(model, visible_text)
+
+    return JSONResponse(content={"gpt": openai_response, "text": visible_text})
+
+@app.post("/lm/adapt")
+async def lm_adapt(website: Website):
+    logging.info(f"Recieved a url: {website.url}")
+    visible_text, html_string = await download_html_and_text(
+        website.url, use_cache=False
+    )
+    model: ModelType = "gpt-4"
+    openai_response = extract_dictionary_from_text(model, visible_text)
+    cleaned_html = clean_html(html_string)
+
+    xpath_dict = get_html_xpath_from_dict(openai_response, cleaned_html, keys_to_ignore=["currency"])
+
+    ## Extract domain from url
+    domain = website.url.split("/")[2]
+    adapted_domains[domain] = xpath_dict
+    logging.info(f"Adapted domain: {domain}")
+
+    return JSONResponse(content={"xpaths": xpath_dict, "domains": adapted_domains})
+
+@app.post("/lm/extract")
+async def lm_extract(website: Website):
+    logging.info(f"Recieved a url: {website.url}")
+    domain = website.url.split("/")[2]
+    if domain not in adapted_domains:
+        raise HTTPException(status_code=400, detail=f"Domain {domain} not found in adapted domains!")
+    
+    visible_text, html_string = await download_html_and_text(
+        website.url, use_cache=False
+    )
+    cleaned_html = clean_html(html_string)
+
+    
+    xpath_dict = adapted_domains[domain]
+    data = extract_data_from_html(xpath_dict, html_string=cleaned_html)
+
+    return JSONResponse(content={"data": data})

@@ -64,3 +64,4 @@ nohup.out
 __pycache__
 *.png
 *.arrow
+*.html

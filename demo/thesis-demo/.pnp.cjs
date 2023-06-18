@@ -44,7 +44,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:18.2.0"],\
             ["typescript", "patch:typescript@npm%3A5.1.3#~builtin<compat/typescript>::version=5.1.3&hash=5da071"],\
-            ["vite", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:4.3.9"]\
+            ["vite", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:4.3.9"],\
+            ["wouter", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:2.11.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -6459,7 +6460,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:18.2.0"],\
             ["typescript", "patch:typescript@npm%3A5.1.3#~builtin<compat/typescript>::version=5.1.3&hash=5da071"],\
-            ["vite", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:4.3.9"]\
+            ["vite", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:4.3.9"],\
+            ["wouter", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:2.11.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -6690,6 +6692,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["use-sync-external-store", [\
+        ["npm:1.2.0", {\
+          "packageLocation": "./.yarn/cache/use-sync-external-store-npm-1.2.0-44f75d2564-5c639e0f8d.zip/node_modules/use-sync-external-store/",\
+          "packageDependencies": [\
+            ["use-sync-external-store", "npm:1.2.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:9e776d328f3b14df9db9542b3b4140525643df1c6d8697ef9c905ac488ab6c8801164ea7826562a38f82e483c6a2359bc2030994b6fee10e14af347e3dea4a1c#npm:1.2.0", {\
+          "packageLocation": "./.yarn/__virtual__/use-sync-external-store-virtual-218e3d7645/0/cache/use-sync-external-store-npm-1.2.0-44f75d2564-5c639e0f8d.zip/node_modules/use-sync-external-store/",\
+          "packageDependencies": [\
+            ["use-sync-external-store", "virtual:9e776d328f3b14df9db9542b3b4140525643df1c6d8697ef9c905ac488ab6c8801164ea7826562a38f82e483c6a2359bc2030994b6fee10e14af347e3dea4a1c#npm:1.2.0"],\
+            ["@types/react", "npm:18.2.12"],\
+            ["react", "npm:18.2.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/react",\
+            "react"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["util-deprecate", [\
         ["npm:1.0.2", {\
           "packageLocation": "./.yarn/cache/util-deprecate-npm-1.0.2-e3fe1a219c-474acf1146.zip/node_modules/util-deprecate/",\
@@ -6768,6 +6792,29 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/word-wrap-npm-1.2.3-7fb15ab002-30b48f91fc.zip/node_modules/word-wrap/",\
           "packageDependencies": [\
             ["word-wrap", "npm:1.2.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["wouter", [\
+        ["npm:2.11.0", {\
+          "packageLocation": "./.yarn/cache/wouter-npm-2.11.0-d7791f9b4f-52ae7231db.zip/node_modules/wouter/",\
+          "packageDependencies": [\
+            ["wouter", "npm:2.11.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:2.11.0", {\
+          "packageLocation": "./.yarn/__virtual__/wouter-virtual-9e776d328f/0/cache/wouter-npm-2.11.0-d7791f9b4f-52ae7231db.zip/node_modules/wouter/",\
+          "packageDependencies": [\
+            ["wouter", "virtual:377a41719d2b0f7b491dde3820a473fe99b8a71a074d03ff1b08bbc652bc002cff4e369914f0c648135982de81ed2c9fc7af0ecd0b4b850dd2ab3c15609290b3#npm:2.11.0"],\
+            ["@types/react", "npm:18.2.12"],\
+            ["react", "npm:18.2.0"],\
+            ["use-sync-external-store", "virtual:9e776d328f3b14df9db9542b3b4140525643df1c6d8697ef9c905ac488ab6c8801164ea7826562a38f82e483c6a2359bc2030994b6fee10e14af347e3dea4a1c#npm:1.2.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/react",\
+            "react"\
           ],\
           "linkType": "HARD"\
         }]\
