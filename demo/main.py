@@ -132,7 +132,7 @@ async def lm_predict(website: Website):
     visible_text, html_string = await download_html_and_text(
         website.url, use_cache=False
     )
-    model: ModelType = "gpt-4"
+    model: ModelType = "gpt-3.5-turbo"
     openai_response = extract_dictionary_from_text(model, visible_text)
 
     return JSONResponse(content={"gpt": openai_response, "text": visible_text})
@@ -143,10 +143,14 @@ async def lm_adapt(website: Website):
     visible_text, html_string = await download_html_and_text(
         website.url, use_cache=False
     )
+    logging.info(f"Text downloaded")
     model: ModelType = "gpt-4"
+    
+    logging.info("Sending to Open-AI")
     openai_response = extract_dictionary_from_text(model, visible_text)
     cleaned_html = clean_html(html_string)
 
+    logging.info("Extracting xpaths")
     xpath_dict = get_html_xpath_from_dict(openai_response, cleaned_html, keys_to_ignore=["currency"])
 
     ## Extract domain from url
